@@ -1201,6 +1201,11 @@ class OpenIDConnectClient
             $len = ((int)$bit)/16;
             $expected_at_hash = $this->urlEncode(substr(hash('sha'.$bit, $accessToken, true), 0, $len));
         }
+
+	if (isset($claims->tid) && strpos($this->getWellKnownIssuer(), "{tenantid}")) {
+            $this->setIssuer(str_replace("{tenantid}", $claims->tid, $this->getWellKnownIssuer()));
+        }
+	    
         return (($this->validateIssuer($claims->iss))
             && (($claims->aud === $this->clientID) || in_array($this->clientID, $claims->aud, true))
             && ($claims->sub === $this->getIdTokenPayload()->sub)
