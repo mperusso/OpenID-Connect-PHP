@@ -254,6 +254,22 @@ class OpenIDConnectClient
      */
     private $token_endpoint_auth_methods_supported = ['client_secret_basic'];
 
+    private $automaticRedirect = true;
+
+    private $providerAuthUrl = '';
+
+    public function getProviderAuthUrl(): string
+    {
+        return $this->providerAuthUrl;
+    }
+
+    public function setAutomaticRedirect(bool $automaticRedirect): OpenIDConnectClient
+    {
+        $this->automaticRedirect = $automaticRedirect;
+
+        return $this;
+    }
+
     /**
      * @param string|null $provider_url optional
      * @param string|null $client_id optional
@@ -1482,8 +1498,11 @@ class OpenIDConnectClient
     }
 
     public function redirect(string $url) {
-        header('Location: ' . $url);
-        exit;
+        if ($this->automaticRedirect) {
+            header('Location: ' . $url);
+            exit;
+        }
+        $this->providerAuthUrl = $url;
     }
 
     public function setHttpProxy(string $httpProxy) {
